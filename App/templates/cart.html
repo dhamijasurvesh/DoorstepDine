@@ -1,0 +1,45 @@
+
+{% extends "layout.html" %}
+{% load math_filters %}
+
+{% block content %}
+    <h2>Your Cart</h2>
+    
+    {% if cart_items %}
+        <div class="container">
+            <ul class="list-group">
+                {% for item in cart_items %}
+                    <li class="list-group-item d-flex justify-content-between align-items-center">
+                        <div class="d-flex align-items-center">
+                            <img src="{{ item.product_id.image_path }}" alt="{{ item.product_id.product_name }}" style="height: 100px; width: 100px; object-fit: cover; margin-right: 15px;">
+                            <div>
+                                <h5>{{ item.product_id.product_name }}</h5>
+                                <p>Restaurant: {{ item.product_id.rest_id}}</p>
+                                <p>Type: {{ item.product_id.get_product_type_display }}</p>
+                                <p>Price: {{ item.product_id.price }}</p>
+                                <p>Subtotal: {{ item.product_id.price|multiply:item.quantity }}</p>
+                            </div>
+                        </div>
+                        
+                        <form method="post" action="{% url 'update_cart_quantity' item.id %}" class="d-flex align-items-center">
+                            {% csrf_token %}
+                            <input type="number" name="quantity" value="{{ item.quantity }}" min="1" class="form-control" style="width: 70px;" onchange="this.form.submit()">
+                        </form>
+                        
+                        <form method="post" action="{% url 'delete_from_cart' item.id %}" style="margin-left: 10px;">
+                            {% csrf_token %}
+                            <button type="submit" class="btn btn-danger">Remove</button>
+                        </form>
+                    </li>
+                {% endfor %}
+            </ul>
+            
+            <div class="mt-4">
+                <h4>Total Price: {{ total_price }}</h4>
+                <button class="btn btn-primary"><a href="{% url 'checkout' %}" class="btn btn-primary">Proceed to Checkout</a></button>
+            </div>
+        </div>
+    {% else %}
+        <p>Your cart is empty. Browse items to add to your cart!</p>
+    {% endif %}
+{% endblock %}

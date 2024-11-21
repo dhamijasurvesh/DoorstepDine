@@ -1,0 +1,51 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Register</title>
+    <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
+</head>
+<body class="bg-gray-100 flex items-center justify-center min-h-screen">
+    <div class="bg-white p-8 rounded-lg shadow-md w-96">
+        <h2 class="text-2xl font-semibold mb-6 text-center">Register</h2>
+        <form method="post" class="mb-6">
+            {% csrf_token %}
+            <div class="mb-4">
+                {{ form.as_p }}
+            </div>
+            <button type="submit" class="w-full bg-blue-500 text-white py-2 rounded hover:bg-blue-600">Register</button>
+        </form>
+        <h3 class="text-lg font-semibold mb-4">Available Subscriptions</h3>
+        <table class="min-w-full bg-white border border-gray-300">
+            <thead>
+                <tr class="bg-gray-200">
+                    <th class="py-2 px-4 border">Subscription ID</th>
+                    <th class="py-2 px-4 border">Duration (Months)</th>
+                    <th class="py-2 px-4 border">Price</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for subscription in subscriptions %}
+                    <tr>
+                        <td class="py-2 px-4 border">{{ subscription.sub_id }}</td>
+                        <td class="py-2 px-4 border">{{ subscription.validity_in_months }}</td>
+                        <td class="py-2 px-4 border">{{ subscription.price }}</td>
+                    </tr>
+                {% empty %}
+                    <tr>
+                        <td colspan="3" class="py-2 px-4 text-center">No subscriptions available.</td>
+                    </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+        <p class="mt-4 text-center">Already have an account?</p>
+        <a href="{% url 'login' %}">
+            <button type="button" class="w-full mt-2 bg-gray-200 text-gray-700 py-2 rounded hover:bg-gray-300">Login Here</button>
+        </a>
+    </div>
+</body>
+</html>
+
+
+

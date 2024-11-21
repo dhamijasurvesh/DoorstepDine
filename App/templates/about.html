@@ -1,0 +1,29 @@
+{% extends "layout.html" %}
+
+{% load static %}
+
+{% block head %}
+    <title>About - DoorstepDine</title>
+{% endblock %}
+
+{% block content %}
+    <header class="text-center mb-6">
+        <h1 class="text-4xl font-bold">About DoorstepDine</h1>
+    </header>
+
+    <div class="about-container mx-auto max-w-2xl text-center">
+        <h2 class="text-3xl mb-4">Welcome to DoorstepDine</h2>
+        <p class="mb-4">
+            DoorstepDine is your go-to platform for fast, reliable, and delicious food delivery. Whether you're craving your favorite comfort meal, exploring new cuisines, or just need a quick snack, DoorstepDine delivers it right to your doorstep. With partnerships with hundreds of restaurants, we provide you with a wide selection of meals, catering to every taste and dietary preference.
+        </p>
+        <img src="{% static 'images/DoorstepDine_logo.webp' %}" alt="DoorstepDine Logo" class="mx-auto mb-4 w-72 h-auto"> 
+        
+        <p class="mb-4">
+            Our vision is to make great food accessible to everyone. We’re continuously expanding our services and partnerships to bring you more choices, better delivery times, and unmatched customer service. Thank you for choosing DoorstepDine – where your next meal is just a click away!
+        </p>
+    </div>
+
+    <footer class="text-center mt-8">
+        <p>&copy; 2024 DoorstepDine. All Rights Reserved.</p>
+    </footer>
+{% endblock %}

@@ -1,0 +1,66 @@
+{% extends "layout.html" %}
+{% block title %}
+Orders
+{% endblock %}
+{% block content %}
+<h2>Your Orders</h2>
+<div class="container">
+    {% if orders %}
+        <table class="table table-striped">
+            <thead>
+                <tr>
+                    <th>Order ID</th>
+                    <th>Product Name</th>
+                    <th>Restaurant Name</th>  
+                    <th>Quantity</th>
+                    <th>Order Amount</th>
+                    <th>Discount (%)</th>
+                    <th>Final Amount</th>
+                    <th>Restaurant Rating</th>
+                    <th>Delivery Agent</th>
+                    <th>Delivery Status</th>
+                    <th>Feedback</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for order in orders %}
+                    <tr>
+                        <td>{{ order.order_id }}</td>
+                        <td>{{ order.product_id.product_name }}</td>
+                        <td>{{ order.product_id.rest_id.rest_name }}</td> 
+                        <td>{{ order.quantity }}</td>
+                        <td>{{ order.order_amt }}</td>
+                        <td>{{ order.discount_in_perc }}</td>
+                        <td>{{ order.final_discounted_amt }}</td>
+                        <td>
+                            <form method="POST" action="{% url 'change_rating' order.order_id %}">
+                                {% csrf_token %}
+                                <select name="new_rating" onchange="this.form.submit()">
+                                    <option value="" disabled selected>Select Rating</option>
+                                    <option value="1" {% if order.rest_rating_given == 1 %}selected{% endif %}>1</option>
+                                    <option value="2" {% if order.rest_rating_given == 2 %}selected{% endif %}>2</option>
+                                    <option value="3" {% if order.rest_rating_given == 3 %}selected{% endif %}>3</option>
+                                    <option value="4" {% if order.rest_rating_given == 4 %}selected{% endif %}>4</option>
+                                    <option value="5" {% if order.rest_rating_given == 5 %}selected{% endif %}>5</option>
+                                </select>
+                            </form>
+                        </td>
+                        <td>{{ order.d_id|default:"N/A" }}</td>
+                        <td>{{ order.status }}</td> 
+                        <td>
+                            <form method="POST" action="{% url 'update_feedback' order.order_id %}"> 
+                                {% csrf_token %}
+                                <input type="text" name="feedback" value="{{ order.feedback }}" maxlength="500" placeholder="Enter feedback" /> 
+                                <button type="submit">Update</button>
+                            </form>
+                        </td>
+                    </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    {% else %}
+        <p>You have no orders yet.</p>
+    {% endif %}
+</div>
+
+{% endblock %}

@@ -1,0 +1,48 @@
+{% extends "layout.html" %}
+{% block content %}
+<div class="max-w-2xl mx-auto mt-8 px-4">
+    <h2 class="text-2xl font-bold text-white mb-4">Select a Restaurant</h2>
+    <form method="POST" class="mb-6 bg-gray-800 p-3 rounded-lg shadow-md">
+        {% csrf_token %}
+        <div class="mb-2">
+            {{ form.as_p }}
+        </div>
+        <button type="submit" class="w-full bg-blue-500 hover:bg-blue-600 text-white font-bold py-1 px-2 rounded">
+            Display Menu
+        </button>
+    </form>
+    {% if items %}
+        <div class="bg-gray-800 p-3 rounded-lg shadow-md mb-4 text-gray-200 text-sm">
+            <p><strong>Rating:</strong> {{ form.cleaned_data.restaurant.rest_rating }}</p>
+            <p><strong>Address:</strong> {{ form.cleaned_data.restaurant.address }}</p>
+            <p><strong>Email:</strong> {{ form.cleaned_data.restaurant.email_id }}</p>
+            <p><strong>Type:</strong> {{ form.cleaned_data.restaurant.r_type }}</p>
+            <p><strong>Hours:</strong> {{ form.cleaned_data.restaurant.open_time }} - {{ form.cleaned_data.restaurant.close_time }}</p>
+        </div>
+        <h3 class="text-lg font-bold text-gray-100 mb-4">Items available in {{ form.cleaned_data.restaurant }}:</h3>       
+        <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4">
+            {% for item in items %}
+                <div class="bg-gray-900 rounded-lg shadow-md overflow-hidden text-sm">
+                    <img src="{{ item.image_path }}" alt="{{ item.product_name }}" class="w-full h-40 object-cover">
+                    <div class="p-3">
+                        <h5 class="text-lg font-semibold text-gray-100 mb-1">{{ item.product_name }}</h5>
+                        <p class="text-gray-400">Type: {{ item.get_product_type_display }}</p>
+                        <p class="text-gray-200 font-semibold mb-2">Price: {{ item.price }}</p>                 
+                        <form method="POST" action="{% url 'add_to_cart' item.product_id %}" class="mt-2">
+                            {% csrf_token %}
+                            <div class="flex items-center">
+                                <input type="number" name="quantity" class="w-14 border border-gray-700 bg-gray-800 text-gray-100 rounded-lg px-1 py-1 mr-2" placeholder="Qty" min="1" value="1" required>
+                                <button type="submit" class="bg-green-500 hover:bg-green-600 text-white font-bold py-1 px-2 rounded">
+                                    Add to Cart
+                                </button>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+            {% endfor %}
+        </div>
+    {% else %}
+        <p class="text-gray-400 mt-4">Please select a restaurant to view available items.</p>
+    {% endif %}
+</div>
+{% endblock %}

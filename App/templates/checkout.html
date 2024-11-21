@@ -1,0 +1,92 @@
+{% extends "layout.html" %}
+{% load math_filters %}
+{% block content %}
+<h2>Order Confirmation</h2>
+<div class="container">
+    {% if cart_items %}
+        <ul class="list-group">
+            {% for item in cart_items %}
+                <li class="list-group-item d-flex justify-content-between align-items-center">
+                    <div class="d-flex align-items-center">
+                        <img src="{{ item.product_id.image_path }}" alt="{{ item.product_id.product_name }}" style="height: 80px; width: 80px; object-fit: cover; margin-right: 15px;">
+                        <div>
+                            <h5>{{ item.product_id.product_name }}</h5>
+                            <p>Restaurant: {{ item.product_id.rest_id }}</p>
+                            <p>Type: {{ item.product_id.get_product_type_display }}</p>
+                            <p>Price: {{ item.product_id.price }}</p>
+                            <p>Subtotal: {{ item.product_id.price|multiply:item.quantity }}</p>
+                        </div>
+                    </div>
+                    <p>Quantity: {{ item.quantity }}</p>
+                </li>
+            {% endfor %}
+        </ul>
+
+        <div class="mt-4">
+            <h4>Total Price: {{ total_price }}</h4>
+            <h5>Subscription Discount: {{ discount_percentage }}%</h5>
+            <h5>Discount Amount: {{ discount_amount }}</h5>
+            <h4>Discounted Price: {{ discounted_total }}</h4>
+        </div>
+        <form id="payment-form">
+            <div id="card-element"></div>
+            <button id="submit" class="btn btn-success mt-3">Pay</button>
+            <div id="payment-result"></div>
+        </form>
+
+        <script src="https://js.stripe.com/v3/"></script>
+        <script>
+            const stripe = Stripe('{{ stripe_public_key }}');
+            const elements = stripe.elements();
+            const cardElement = elements.create('card', {
+                style: {
+                    base: {
+                        color: "#FFFFFF",  
+                        fontFamily: '"Helvetica Neue", Helvetica, sans-serif',
+                        fontSize: '16px',
+                        '::placeholder': {
+                            color: '#A9A9A9'  
+                        }
+                    },
+                    invalid: {
+                        color: '#FF0000',  
+                        iconColor: '#FF0000'
+                    }
+                }
+            });
+            cardElement.mount('#card-element');
+            document.getElementById('payment-form').addEventListener('submit', async (event) => {
+                event.preventDefault();
+                const response = await fetch('{% url "checkout" %}', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'X-CSRFToken': '{{ csrf_token }}',
+                    },
+                });
+                const { client_secret } = await response.json();
+                const { error } = await stripe.confirmCardPayment(client_secret, {
+                    payment_method: {
+                        card: cardElement,
+                    },
+                });
+                if (error) {
+                    document.getElementById('payment-result').innerText = error.message;
+                } else {
+                    await fetch('{% url "confirm_order" %}', {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json',
+                            'X-CSRFToken': '{{ csrf_token }}',
+                        },
+                        body: JSON.stringify({ payment_successful: true })
+                    });
+                    window.location.href = "{% url 'order_successful' %}";
+                }
+            });
+        </script>
+    {% else %}
+        <p>Your cart is empty. Please add items to proceed to checkout.</p>
+    {% endif %}
+</div>
+{% endblock %}
